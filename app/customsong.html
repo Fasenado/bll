@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom music for Blob Opera</title>
+        <link href="./bootstrap.min.css" rel="stylesheet" />
+        <script src="./files/app.js"></script>
+        <link href="./fonts/fonts.css" rel="stylesheet" />
+        <style>
+            body {
+                background: none !important;
+                background-color: var(--bs-body-bg);
+                overflow: auto;
+                font-family: Inter, var(--bs-body-font-family);
+                font-size: var(--bs-body-font-size);
+                font-weight: var(--bs-body-font-weight);
+                line-height: var(--bs-body-line-height);
+                color: var(--bs-body-color);
+            }
+            .toggle-mode {
+                display: flex;
+                justify-content: flex-end;
+                margin-bottom: 20px;
+            }
+            .links-section {
+                margin-top: 30px;
+            }
+            .bi {
+                width: 1em;
+                height: 1em;
+                vertical-align: -0.125em;
+                fill: currentcolor;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container my-5">
+            <div class="toggle-mode">
+                <button type="button" class="btn btn-outline-primary" id="toggle-light">Light</button>
+                <button type="button" class="btn btn-outline-secondary mx-2" id="toggle-dark">Dark</button>
+                <button type="button" class="btn btn-outline-success" id="toggle-auto">Auto</button>
+            </div>
+            <h1 class="h1 mb-4">Custom music for Blob Opera</h1>
+            <div class="mb-3">
+                <label for="fileInput" class="form-label">Upload JSON File:</label>
+                <input type="file" id="fileInput" class="form-control" accept=".json" />
+            </div>
+            <button type="button" onclick="uploadAndStore()" class="btn btn-primary mb-4">Upload and store</button>
+            <p>
+                Need help? Convert your MIDI with
+                <a href="https://github.com/OverlappingElvis/blob-opera-midi">blob-opera-midi</a>.
+            </p>
+            <a href="./index.html">Go back to Blob Opera</a>
+            <p class="fw-bold mt-4">Saved song(s)</p>
+            <ul id="entriesList" class="list-group mt-3"></ul>
+
+            <div class="mt-4 alert alert-warning d-flex align-items-center" role="alert">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"
+                    viewBox="0 0 16 16"
+                    role="img"
+                    aria-label="Warning:">
+                    <path
+                        d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+                </svg>
+                <div>If you see black screen, it means the JSON file is not a valid Blob Opera's format.</div>
+            </div>
+        </div>
+
+        <!-- Modal for Alert -->
+        <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="h5 modal-title" id="alertModalLabel">Notification</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="alertModalBody">
+                        <!-- Alert message will be injected here -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="d-block w-50 btn btn-secondary" data-bs-dismiss="modal">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Confirm -->
+        <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="h5 modal-title" id="confirmModalLabel">Confirm</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="confirmModalBody">
+                        <!-- Confirm message will be injected here -->
+                    </div>
+                    <div class="modal-footer">
+                        <div class="hstack gap-2 mx-auto col">
+                            <button type="button" class="d-block w-50 btn btn-secondary" data-bs-dismiss="modal">
+                                No
+                            </button>
+                            <button type="button" class="d-block w-50 btn btn-primary" id="confirmModalYes">Yes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Prompt -->
+        <div class="modal fade" id="promptModal" tabindex="-1" aria-labelledby="promptModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="h5 modal-title" id="promptModalLabel"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="promptInput" class="form-label">Enter new name:</label>
+                        <input type="text" class="form-control" id="promptInput" />
+                    </div>
+                    <div class="modal-footer">
+                        <div class="hstack gap-2 mx-auto col">
+                            <button type="button" class="d-block w-50 btn btn-secondary" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="button" class="d-block w-50 btn btn-primary" id="promptModalSave">
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="./bootstrap.bundle.min.js"></script>
+        <script>
+            // Function to show alert modal
+            function showAlert(message) {
+                document.getElementById("alertModalBody").textContent = message;
+                const alertModal = new bootstrap.Modal(document.getElementById("alertModal"));
+                alertModal.show();
+            }
+
+            // Function to show confirm modal
+            function showConfirm(message, callback) {
+                document.getElementById("confirmModalBody").textContent = message;
+                const confirmModal = new bootstrap.Modal(document.getElementById("confirmModal"));
+
+                document.getElementById("confirmModalYes").onclick = () => {
+                    callback(true);
+                    confirmModal.hide();
+                };
+
+                document.getElementById("confirmModal").querySelector(".btn-close").onclick = () => {
+                    callback(false);
+                };
+
+                document.getElementById("confirmModal").querySelector(".btn-secondary").onclick = () => {
+                    callback(false);
+                };
+
+                confirmModal.show();
+            }
+
+            // Function to show prompt modal
+            function showPrompt(message, defaultValue, callback) {
+                document.getElementById("promptModalLabel").textContent = message;
+                document.getElementById("promptInput").value = defaultValue;
+                const promptModal = new bootstrap.Modal(document.getElementById("promptModal"));
+
+                document.getElementById("promptModalSave").onclick = () => {
+                    const newValue = document.getElementById("promptInput").value;
+                    callback(newValue);
+                    promptModal.hide();
+                };
+
+                promptModal.show();
+            }
+
+            async function uploadAndStore() {
+                const fileInput = document.getElementById("fileInput");
+                const file = fileInput.files[0];
+                if (!file) {
+                    showAlert("There is no JSON file.");
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = async function (event) {
+                    try {
+                        const jsonObject = JSON.parse(event.target.result);
+                        const binaryData = Bt.RecordingMessage.encode(jsonObject).finish();
+                        const dateNow = new Date().toISOString();
+                        await saveToIndexedDB(binaryData, dateNow);
+                        showAlert("Data encoded and stored successfully.");
+                        loadEntries(); // Refresh the list of entries
+                    } catch (error) {
+                        showAlert("Failed to process file. Error: " + error.message);
+                        console.error(error);
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            function openIndexedDB() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open("RecordingsDB", 1);
+                    request.onerror = (event) => reject("IndexedDB error: " + event.target.errorCode);
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        if (!db.objectStoreNames.contains("recordings")) {
+                            db.createObjectStore("recordings", { keyPath: "id" });
+                        }
+                    };
+                    request.onsuccess = (event) => resolve(event.target.result);
+                });
+            }
+
+            async function saveToIndexedDB(binaryData, dateNow) {
+                const db = await openIndexedDB();
+                const transaction = db.transaction(["recordings"], "readwrite");
+                const store = transaction.objectStore("recordings");
+                const id = Date.now() + "-" + Math.random().toString(36).substring(2, 10);
+                const request = store.put({ id: id, data: binaryData, date: dateNow });
+                request.onsuccess = () => {
+                    loadEntries(); // Refresh the list of entries immediately after storing new data
+                };
+                request.onerror = (event) => {
+                    showAlert("Error saving recording to IndexedDB: " + event.target.errorCode);
+                };
+            }
+
+            async function loadEntries() {
+                const db = await openIndexedDB();
+                const transaction = db.transaction(["recordings"], "readonly");
+                const store = transaction.objectStore("recordings");
+                const request = store.getAll();
+                request.onsuccess = () => {
+                    const entriesList = document.getElementById("entriesList");
+                    entriesList.innerHTML = ""; // Clear existing entries
+                    if (request.result.length === 0) {
+                        entriesList.innerHTML =
+                            "<p class='text-secondary-emphasis fst-italic'>This list is empty. Go add some songs, either by recording or uploading some files here!</p>";
+                    } else
+                        request.result.forEach((entry) => {
+                            const li = document.createElement("li");
+                            li.className = "list-group-item";
+                            const date = new Date(entry.date).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                second: "2-digit",
+                                hour12: false,
+                            });
+                            const link = `./index.html#/r/${entry.id}`;
+                            li.innerHTML = `
+                        <div class="row">
+                        <div class="col-6"><a href="${link}">${
+                                entry.name || entry.id
+                            }</a><button type="button" class="btn btn-info btn-sm ms-2" onclick="promptRename('${entry.id}', '${
+                                entry.name || entry.id
+                            }')">Rename</button></div>
+                        <div class="col-5">${date}</div>
+                        <div class="col-lg-1"><button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('${
+                            entry.id
+                        }')">Delete</button></div>
+                        `;
+                            entriesList.appendChild(li);
+                        });
+                };
+                request.onerror = (event) => {
+                    console.error("Error fetching entries from IndexedDB:", event.target.errorCode);
+                };
+            }
+
+            function confirmDelete(id) {
+                showConfirm("Are you sure you want to delete this?", (result) => {
+                    if (result) {
+                        deleteEntry(id);
+                    }
+                });
+            }
+
+            async function deleteEntry(id) {
+                const db = await openIndexedDB();
+                const transaction = db.transaction(["recordings"], "readwrite");
+                const store = transaction.objectStore("recordings");
+                const request = store.delete(id);
+
+                request.onsuccess = () => {
+                    loadEntries(); // Refresh the list after deletion
+                    showAlert("The song file deleted successfully.");
+                };
+                request.onerror = (event) => {
+                    showAlert("Error deleting entry: " + event.target.errorCode);
+                };
+            }
+
+            function promptRename(oldId, currentName) {
+                showPrompt("Rename", currentName, (newName) => {
+                    if (newName !== null && newName !== "" && newName !== currentName) {
+                        renameEntry(oldId, newName);
+                    }
+                });
+            }
+
+            async function renameEntry(oldId, newName) {
+                const db = await openIndexedDB();
+                const transaction = db.transaction(["recordings"], "readwrite");
+                const store = transaction.objectStore("recordings");
+                const getData = store.get(oldId);
+
+                getData.onsuccess = () => {
+                    const data = getData.result;
+                    if (data) {
+                        // Update the name property within the data object
+                        data.name = newName;
+
+                        // Re-save the updated object under the same ID
+                        const updateRequest = store.put(data);
+                        updateRequest.onsuccess = () => {
+                            showAlert("Rename successful.");
+                            loadEntries(); // Reload the list to show the updated name
+                        };
+                        updateRequest.onerror = (event) => {
+                            showAlert("Failed to update data: " + event.target.errorCode);
+                        };
+                    } else {
+                        showAlert("Record not found.");
+                    }
+                };
+                getData.onerror = (event) => {
+                    showAlert("Failed to retrieve data for renaming: " + event.target.errorCode);
+                };
+            }
+
+            // Load entries on page load
+            window.onload = loadEntries;
+
+            document.getElementById("toggle-light").addEventListener("click", function () {
+                document.documentElement.setAttribute("data-bs-theme", "light");
+            });
+
+            document.getElementById("toggle-dark").addEventListener("click", function () {
+                document.documentElement.setAttribute("data-bs-theme", "dark");
+            });
+
+            document.getElementById("toggle-auto").addEventListener("click", function () {
+                document.documentElement.setAttribute("data-bs-theme", "auto");
+                const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                if (prefersDarkScheme) {
+                    document.documentElement.setAttribute("data-bs-theme", "dark");
+                } else {
+                    document.documentElement.setAttribute("data-bs-theme", "light");
+                }
+            });
+
+            // Initialize based on the user's system preference
+            const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            if (prefersDarkScheme) {
+                document.documentElement.setAttribute("data-bs-theme", "dark");
+            } else {
+                document.documentElement.setAttribute("data-bs-theme", "light");
+            }
+        </script>
+    </body>
+</html>

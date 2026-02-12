@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Blob Opera | Solana Experiment</title>
+        <link rel="icon" type="image/x-icon" href="./icons/appicon.ico">
+        <meta
+            name="viewport"
+            content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no" />
+
+        <link href="./fonts/fonts.css" rel="stylesheet" />
+    </head>
+
+    <body>
+        <!-- Token address — top center -->
+        <div id="token-address" style="display:none; position:fixed; top:12px; left:50%; transform:translateX(-50%);
+            z-index:9999; font-family:'Roboto Mono',monospace; font-size:13px; color:#fff;
+            background:rgba(0,0,0,0.55); padding:6px 16px; border-radius:8px;
+            backdrop-filter:blur(6px); user-select:all; cursor:pointer; white-space:nowrap;
+            letter-spacing:0.3px; transition:background 0.2s;"
+            onmouseover="this.style.background='rgba(0,0,0,0.75)'"
+            onmouseout="this.style.background='rgba(0,0,0,0.55)'"
+            onclick="navigator.clipboard.writeText('BxHCvfj35ytNKmHvzonVDCzk2fdBB7KjvbAFFb6tpump')"
+            title="Click to copy">
+            BxHCvfj35ytNKmHvzonVDCzk2fdBB7KjvbAFFb6tpump
+        </div>
+
+        <!-- Navigation — top right -->
+        <nav id="web-nav" style="display:none; position:fixed; top:12px; right:12px; z-index:9999; display:flex; gap:8px;">
+            <button id="about-btn"
+               style="background:rgba(0,0,0,0.55); color:#fff; padding:8px 16px; border-radius:8px;
+                      border:none; cursor:pointer; font-family:Inter,sans-serif; font-size:14px;
+                      backdrop-filter:blur(6px); transition:background 0.2s;"
+               onmouseover="this.style.background='rgba(0,0,0,0.75)'"
+               onmouseout="this.style.background='rgba(0,0,0,0.55)'">
+                About
+            </button>
+            <a href="./customsong.html"
+               style="background:rgba(0,0,0,0.55); color:#fff; padding:8px 16px; border-radius:8px;
+                      text-decoration:none; font-family:Inter,sans-serif; font-size:14px;
+                      backdrop-filter:blur(6px); transition:background 0.2s;"
+               onmouseover="this.style.background='rgba(0,0,0,0.75)'"
+               onmouseout="this.style.background='rgba(0,0,0,0.55)'">
+                Custom Songs
+            </a>
+            <a href="https://x.com" target="_blank" rel="noopener noreferrer"
+               style="background:rgba(0,0,0,0.55); color:#fff; padding:8px 12px; border-radius:8px;
+                      text-decoration:none; font-family:Inter,sans-serif; font-size:14px;
+                      backdrop-filter:blur(6px); transition:background 0.2s; display:flex; align-items:center;"
+               onmouseover="this.style.background='rgba(0,0,0,0.75)'"
+               onmouseout="this.style.background='rgba(0,0,0,0.55)'"
+               title="X (Twitter)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="https://pump.fun" target="_blank" rel="noopener noreferrer"
+               style="background:rgba(0,0,0,0.55); color:#fff; padding:8px 12px; border-radius:8px;
+                      text-decoration:none; font-family:Inter,sans-serif; font-size:14px;
+                      backdrop-filter:blur(6px); transition:background 0.2s; display:flex; align-items:center;"
+               onmouseover="this.style.background='rgba(0,0,0,0.75)'"
+               onmouseout="this.style.background='rgba(0,0,0,0.55)'"
+               title="Pump.fun">
+                <span style="font-weight:700; font-size:13px; letter-spacing:0.5px;">PUMP</span>
+            </a>
+        </nav>
+
+        <!-- About Modal -->
+        <div id="about-modal" style="display:none; position:fixed; inset:0; z-index:10000;
+            background:rgba(0,0,0,0.7); backdrop-filter:blur(8px);
+            justify-content:center; align-items:center;">
+            <div style="background:rgba(20,20,30,0.95); color:#fff; border-radius:16px;
+                max-width:520px; width:90%; max-height:80vh; overflow-y:auto;
+                padding:32px; font-family:Inter,sans-serif; position:relative;
+                box-shadow:0 8px 40px rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.08);">
+                <button id="close-about" style="position:absolute; top:12px; right:16px;
+                    background:none; border:none; color:#aaa; font-size:24px; cursor:pointer;
+                    line-height:1; padding:4px;" title="Close">&times;</button>
+                <h2 style="margin:0 0 16px; font-size:22px; font-weight:700; letter-spacing:-0.3px;">
+                    Blob Opera &mdash; Solana Experiment
+                </h2>
+                <p style="margin:0 0 14px; line-height:1.65; font-size:14px; color:#ccc;">
+                    This is an interactive experiment on the <strong style="color:#fff;">Solana blockchain</strong>.
+                    A creative trial exploring how art, music, and decentralized technology can intersect &mdash;
+                    merging the world of machine learning with the spirit of Web3.
+                </p>
+                <p style="margin:0 0 14px; line-height:1.65; font-size:14px; color:#ccc;">
+                    Play four opera voices in real time &mdash; no singing skills required.
+                    A machine learning model was trained on 16 hours of professional opera singing
+                    to understand what opera sounds like. Drag the blobs to create your own music.
+                </p>
+                <p style="margin:0 0 18px; line-height:1.65; font-size:14px; color:#ccc;">
+                    Take the blobs on tour to cities around the world &mdash; London, New York, Mexico City,
+                    Seoul, Cape Town, and Paris &mdash; and hear them sing classic songs from each location.
+                </p>
+                <div style="background:rgba(255,255,255,0.06); border-radius:10px; padding:14px 16px; margin-bottom:8px;">
+                    <p style="margin:0 0 6px; font-size:12px; color:#888; text-transform:uppercase; letter-spacing:1px; font-weight:600;">
+                        Contract Address
+                    </p>
+                    <p style="margin:0; font-family:'Roboto Mono',monospace; font-size:12px; color:#9fe2bf;
+                        word-break:break-all; cursor:pointer; user-select:all;"
+                        onclick="navigator.clipboard.writeText('BxHCvfj35ytNKmHvzonVDCzk2fdBB7KjvbAFFb6tpump')"
+                        title="Click to copy">
+                        BxHCvfj35ytNKmHvzonVDCzk2fdBB7KjvbAFFb6tpump
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Show overlay only in browser (not in Electron)
+            (function() {
+                var isElectron = (typeof process !== 'undefined' && process.versions && process.versions.electron)
+                    || (typeof navigator === 'object' && navigator.userAgent.indexOf('Electron') >= 0);
+                if (!isElectron) {
+                    document.getElementById('web-nav').style.display = 'flex';
+                    document.getElementById('token-address').style.display = 'block';
+                }
+            })();
+
+            // About modal logic
+            var aboutModal = document.getElementById('about-modal');
+            document.getElementById('about-btn').addEventListener('click', function() {
+                aboutModal.style.display = 'flex';
+            });
+            document.getElementById('close-about').addEventListener('click', function() {
+                aboutModal.style.display = 'none';
+            });
+            aboutModal.addEventListener('click', function(e) {
+                if (e.target === aboutModal) aboutModal.style.display = 'none';
+            });
+        </script>
+        <script src="./files/app.js"></script>
+    </body>
+</html>
